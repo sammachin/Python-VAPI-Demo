@@ -22,6 +22,7 @@ Check that the private key has been saved to key.txt `cat key.txt`
 rename example_config.py to config.py
 Fill in the values in config.py as appropriate.
 
-link the LVN to the app id with the nexmo cli `nexmo link:app [LVN] [app-id]`
+Link the LVN to the app id with the nexmo cli `nexmo link:app [LVN] [app-id]`
 Update the app to set the webhook urls to be your server instead of the example.com placeholders used at creation.
+
 `nexmo app:update ['app-id'] MyFirstVAPIApp [your url]/call [your url]/event`
