@@ -79,13 +79,10 @@ class RecordingHandler(tornado.web.RequestHandler):
 
 class PlaybackHandler(tornado.web.RequestHandler):
 	def get(self, slug):
-		url = 'https://api.nexmo.com/media/download?id='+slug
-		headers = {
-		        "Content-type": "application/json",
-		        "Authorization": "Bearer {0}".format(mint_token())
-		}
-		response = requests.get(url, headers=headers)
+		url = 'https://api.nexmo.com/media/download?id={}&api_key={}&api_secret={}'.format(slug, nexmo_apikey, nexmo_secret)
+		response = requests.get(url)
 		self.write(response.content)
+		self.set_header('Content-Type', 'audio/mpeg')
 		self.finish()
 
 class EventHandler(tornado.web.RequestHandler):
