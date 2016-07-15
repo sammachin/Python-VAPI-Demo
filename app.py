@@ -73,7 +73,7 @@ class RecordingHandler(tornado.web.RequestHandler):
 		to = self.get_argument("to", None)
 		fr = self.get_argument("fr", None)
         
-		message = "Recording of call From: {} To: {} Message: {}".format(fr, to, playback_url)
+		message = "Recording of call From: {} To: {} Recording: {}".format(fr, to, playback_url)
         
 		client = nexmo.Client(key=nexmo_apikey, secret=nexmo_secret)
 		client.send_message({'from': 'Nexmo', 'to': proxyToNumber, 'text': message})
