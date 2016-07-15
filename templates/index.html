@@ -7,7 +7,7 @@
         function sub() {
  
             pubnub = PUBNUB({
-                subscribe_key : 'sub-c-7a8b107e-48c7-11e6-971e-02ee2ddab7fe' //Change this to Your Key
+                subscribe_key : '{{pubnubSubKey}}'
             })
      
             console.log("Subscribing..");
@@ -32,5 +32,6 @@
 	<body>
 		<h1>Hello World</h1>
 		<p>This is a VAPI Demo</p>
+		<p>Please call {{ inboundNumber }}</p>
 	</body>
 </HTML>

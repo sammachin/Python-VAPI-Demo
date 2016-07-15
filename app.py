@@ -17,23 +17,26 @@ pubnub = Pubnub(publish_key=pubnubPubKey, subscribe_key=pubnubSubKey)
 
 
 def mint_token(application_id=app_uuid, keyfile=keyfile):
-    application_private_key = open(keyfile, 'r').read()
-    d = datetime.utcnow()
-    token_payload = {
-        "iat": calendar.timegm(d.utctimetuple()),  # issued at
-         "application_id": application_id,  # application id
-         "jti": urlsafe_b64encode(os.urandom(64)).decode('utf-8')
-    }
-    return jwt.encode(
-        claims=token_payload,
-        key=application_private_key,
-        algorithm='RS256')
+	application_private_key = open(keyfile, 'r').read()
+	d = datetime.utcnow()
+	token_payload = {
+		"iat": calendar.timegm(d.utctimetuple()),  # issued at
+		 "application_id": application_id,  # application id
+		 "jti": urlsafe_b64encode(os.urandom(64)).decode('utf-8')
+	}
+	return jwt.encode(
+		claims=token_payload,
+		key=application_private_key,
+		algorithm='RS256')
 
 
 class MainHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
 	def get(self):
-		self.redirect('/s/index.html')
+		self.render('templates/index.html',
+					inboundNumber=inboundNumber,
+					pubnubPubKey=pubnubPubKey, 
+					pubnubSubKey=pubnubSubKey)
 		
 class CallHandler(tornado.web.RequestHandler):
 	@tornado.web.asynchronous
@@ -52,7 +55,7 @@ class CallHandler(tornado.web.RequestHandler):
 		a['endpoint'] = []
 		e = {}
 		e['type'] = 'phone'
-		e['number'] = MyNumber
+		e['number'] = proxyToNumber
 		a['endpoint'].append(e)	
 		a['from'] = fr
 		ncco.append(a)
@@ -69,9 +72,14 @@ class RecordingHandler(tornado.web.RequestHandler):
 		playback_url = base + "/play/" + download_id
 		to = self.get_argument("to", None)
 		fr = self.get_argument("fr", None)
-		message = "Recording of call From: {} To: {} \r{}".format(fr, to, playback_url)
+        
+		message = "Recording of call From: {} To: {} Message: {}".format(fr, to, playback_url)
+        
 		client = nexmo.Client(key=nexmo_apikey, secret=nexmo_secret)
-		client.send_message({'from': 'Nexmo', 'to': MyNumber, 'text': message})
+		client.send_message({'from': 'Nexmo', 'to': proxyToNumber, 'text': message})
+		
+		pubnub.publish('call', message)
+		
 		self.content_type = 'text/plain'
 		self.write('ok')
 		self.finish()
@@ -123,6 +131,7 @@ def main():
 											(r"/message", MessageHandler),
 											(r'/s/(.*)', tornado.web.StaticFileHandler, {'path': static_path}),
 											])
+	application.debug = True
 	http_server = tornado.httpserver.HTTPServer(application)
 	port = int(os.environ.get("PORT", 5000))
 	http_server.listen(port)
@@ -132,4 +141,3 @@ if __name__ == "__main__":
 	main()
 	
 	
-
