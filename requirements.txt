@@ -1,6 +1,6 @@
 tornado==3.1.1
 wsgiref==0.1.2
-requests==2.9.1
+requests==2.20.0
 nexmo==1.0.3
 python-jose==1.0.0
 pubnub==3.7.7
